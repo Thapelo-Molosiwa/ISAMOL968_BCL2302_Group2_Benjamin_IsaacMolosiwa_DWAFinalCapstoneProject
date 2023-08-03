@@ -22,13 +22,27 @@
   max-width: 100%;
   height: auto;
 }
-
+/* 
 h2 {
   margin-top: 10px;
-}
+} */
 
-p {
+/* p {
   margin-top: 5px;
-}
+} */
 
 
+
+  /* .card-overview {
+    max-width: 300px;
+  } */
+
+  .card-overview small {
+    color: var(--sl-color-neutral-500);
+  }
+
+  .card-overview [slot="footer"] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }

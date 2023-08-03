@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import Header from "../Header/Header";
 import Middle from "../Context/Middle";
 import "./LogIn.css";
+import Buttons from "../Direct/Buttons";
 
 export default function SigninForm() {
 
@@ -34,6 +35,8 @@ export default function SigninForm() {
     return (
       <div className="body">
         <Header />
+        <br/>
+        <Buttons/>
         <br/>
         <Middle />
       </div>
