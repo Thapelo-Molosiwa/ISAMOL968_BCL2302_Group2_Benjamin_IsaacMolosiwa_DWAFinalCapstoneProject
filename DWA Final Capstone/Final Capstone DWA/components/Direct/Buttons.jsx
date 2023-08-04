@@ -1,12 +1,4 @@
 import React from "react";
-import "../Direct/Buttons.css";
-import {
-  SlButton,
-  SlButtonGroup,
-  SlDropdown,
-  SlMenu,
-  SlMenuItem,
-} from "@shoelace-style/shoelace/dist/react";
 
 export default function Buttons() {
   return (
@@ -20,19 +12,6 @@ export default function Buttons() {
             <SlMenu>
               <SlMenuItem>A-Z</SlMenuItem>
               <SlMenuItem>Z-A</SlMenuItem>
-             
-            </SlMenu>
-          </SlDropdown>
-        </SlButtonGroup>
-      </div>
-
-      <div className="ButtonTwo">
-
-      <SlButtonGroup label="Example Button Group">
-          <SlButton variant="primary">Favourites</SlButton>
-          <SlDropdown placement="bottom-end">
-            <SlButton slot="trigger" variant="primary" caret></SlButton>
-            <SlMenu>
               <SlMenuItem>Descending</SlMenuItem>
               <SlMenuItem>Asccending</SlMenuItem>
              
@@ -40,6 +19,8 @@ export default function Buttons() {
           </SlDropdown>
         </SlButtonGroup>
       </div>
+
+     
 
    
      

@@ -1,17 +1,54 @@
-.Buttons{
+
+
+.Buttons {
     display: flex;
-   margin: -8px;
-   box-shadow: 0px 2.98256px 7.4564px rgba(0, 0, 0, 0.1); 
-   height: 60px;
-   justify-content: space-evenly ;
-}
-
-
-.ButtonOne{
+    margin: -8px;
+    box-shadow: 0px 2.98256px 7.4564px rgba(0, 0, 0, 0.1);
+    height: 60px;
+    justify-content: space-evenly;
+  }
+  
+  .ButtonOne {
     text-align: right;
-   padding-top: 10px;
-}
-
-.ButtonTwo{
     padding-top: 10px;
-}
+  }
+  
+  .ButtonTwo {
+    padding-top: 10px;
+  }
+  
+  .ButtonThree {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .Buttons {
+      flex-direction: column;
+      height: auto;
+    }
+  
+    .ButtonOne,
+    .ButtonTwo,
+    .ButtonThree {
+      text-align: center;
+      padding-top: 5px;
+    }
+  
+  
+    .ButtonThree {
+      padding-bottom: 20px;
+      text-align: ;
+    }
+  
+    /* Additional styles for the dropdowns to make them full width */
+    .sl-menu {
+      width: 100%;
+    }
+  
+    .sl-button-group {
+      width: 100%;
+    }
+  }
+  

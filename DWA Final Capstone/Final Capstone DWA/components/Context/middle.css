@@ -22,21 +22,10 @@
   max-width: 100%;
   height: auto;
 }
-/* 
-h2 {
+.Audio{
+  width: 100%;
   margin-top: 10px;
-} */
-
-/* p {
-  margin-top: 5px;
-} */
-
-
-
-  /* .card-overview {
-    max-width: 300px;
-  } */
-
+}
   .card-overview small {
     color: var(--sl-color-neutral-500);
   }
