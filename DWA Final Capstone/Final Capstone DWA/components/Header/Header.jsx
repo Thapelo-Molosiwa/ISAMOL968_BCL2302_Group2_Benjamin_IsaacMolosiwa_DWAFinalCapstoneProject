@@ -1,7 +1,6 @@
 import React from "react";
 import "../Header/header.css"
-import { SlButton } from '@shoelace-style/shoelace/dist/react';
-import { SlAvatar } from '@shoelace-style/shoelace/dist/react';
+import { SlIcon } from '@shoelace-style/shoelace/dist/react';
 
 
 
@@ -12,9 +11,14 @@ export default function Header(){
   return(
 
     <div className="Header">
-      <div>
-        
-        
+      <div className="LogoPic">
+       <SlIcon src="https://shoelace.style/assets/images/shoe.svg" style={{ fontSize: '7rem' }}></SlIcon>
+      </div>
+      <div className="Headddd">
+        <h1>
+      kick  Budd Podcast
+        </h1>
+
       </div>
     </div>
   )
