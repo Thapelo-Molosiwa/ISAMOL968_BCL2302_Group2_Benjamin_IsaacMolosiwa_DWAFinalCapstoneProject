@@ -1,7 +1,14 @@
 import React from "react";
-import { SlCard, SlDetails, SlRating } from "@shoelace-style/shoelace/dist/react";
-import '../favs/favs.css'
-const FavoriteShow = ({ show, handleRemoveFromFavorites }) => {
+import {
+  SlCard,
+  SlDetails,
+  SlRating,
+} from "@shoelace-style/shoelace/dist/react";
+import "../favs/favs.css";
+
+
+
+export default function FavoriteShow ({ show, handleRemoveFromFavorites }) {
   const getGenres = (genreIds) => {
     const genres = [
       "Personal Growth",
@@ -15,9 +22,11 @@ const FavoriteShow = ({ show, handleRemoveFromFavorites }) => {
       "Kids and Family",
     ];
 
+    // Ensure genreIds is always an array
     if (!Array.isArray(genreIds)) {
       genreIds = [genreIds];
     }
+    // Map genre IDs to names and join with commas
     return genreIds.map((id) => genres[id - 1]).join(",");
   };
 
@@ -40,9 +49,7 @@ const FavoriteShow = ({ show, handleRemoveFromFavorites }) => {
         </small>
       </SlCard>
       <div className="card-footer">
-        <SlDetails summary="Show Description">
-          {show.description}
-        </SlDetails>
+        <SlDetails summary="Show Description">{show.description}</SlDetails>
         <br />
         <SlRating
           label="Rating"
@@ -56,4 +63,4 @@ const FavoriteShow = ({ show, handleRemoveFromFavorites }) => {
   );
 };
 
-export default FavoriteShow;
+

@@ -5,6 +5,7 @@ import {
   SlDetails,
   SlInput,
   SlButton,
+  SlDrawer,
   SlButtonGroup,
   SlDropdown,
   SlMenu,
@@ -14,6 +15,7 @@ import {
 } from "@shoelace-style/shoelace/dist/react";
 import "./middle.css";
 import "./Buttons.css";
+import Loading from "../loading/Loading";
 
 // Define the genres array with different categories of shows
 const genres = [
@@ -40,7 +42,12 @@ const getGenres = (genreIds) => {
   return genreIds.map((id) => genres[id - 1]).join(",");
 };
 
-const PodcastCard = ({ show, handleAddToFavorites, handleRemoveFromFavorites, isFavorite }) => {
+const PodcastCard = ({
+  show,
+  handleAddToFavorites,
+  handleRemoveFromFavorites,
+  isFavorite,
+}) => {
   const [showSeasons, setShowSeasons] = useState(false); // State variable to control seasons visibility
 
   const handleShowSeasons = () => {
@@ -80,7 +87,9 @@ const PodcastCard = ({ show, handleAddToFavorites, handleRemoveFromFavorites, is
                     {season.episodes && (
                       <SlTreeItem>
                         {season.episodes.map((episode) => (
-                          <SlTreeItem key={episode.id}>{episode.name}</SlTreeItem>
+                          <SlTreeItem key={episode.id}>
+                            {episode.name}
+                          </SlTreeItem>
                         ))}
                       </SlTreeItem>
                     )}
@@ -92,11 +101,9 @@ const PodcastCard = ({ show, handleAddToFavorites, handleRemoveFromFavorites, is
         </div>
       )}
       <div className="card-footer">
-        <SlDetails summary="Show Description">
-          {show.description}
-        </SlDetails>
+        <SlDetails summary="Show Description">{show.description}</SlDetails>
         <br />
-        <SlRating
+        <button
           label="Rating"
           getSymbol={() => '<sl-icon name="heart-fill"></sl-icon>'}
           style={{ "--symbol-color-active": "#ff4136" }}
@@ -108,7 +115,9 @@ const PodcastCard = ({ show, handleAddToFavorites, handleRemoveFromFavorites, is
             }
           }}
           interactive // Make the rating component clickable
-        />
+        >
+          Add to favorites
+        </button>
       </div>
     </div>
   );
@@ -116,10 +125,12 @@ const PodcastCard = ({ show, handleAddToFavorites, handleRemoveFromFavorites, is
 
 export default function Middle() {
   // State hooks for managing the component's state
+  const [open, setOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showsData, setShowsData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(true); // Introduce a loading state
   const [showFavorites, setShowFavorites] = useState(false); // State variable to control favorites visibility
 
   // Fetch the shows data from the API using useEffect
@@ -140,8 +151,12 @@ export default function Middle() {
 
         const completeData = await Promise.all(completeDataPromises);
         setShowsData(completeData);
+        setLoading(false);
       })
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      });
   }, []);
 
   // Handler for input change in the search box
@@ -159,6 +174,14 @@ export default function Middle() {
     }
   };
 
+  function SearchAndClear() {
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const handleClearClick = () => {
+      setSearchQuery("");
+    };
+  }
+
   // Handler for changing the sort criteria
   const handleSortChange = (selectedSort) => {
     if (selectedSort === "Sort") {
@@ -166,15 +189,24 @@ export default function Middle() {
       return;
     }
 
-    let sortedResults;
+    let sortedResults; // Declare a variable to store the sorted results
     if (selectedSort === "A-Z") {
-      sortedResults = [...showsData].sort((a, b) => a.title.localeCompare(b.title));
+      // If sorting by A-Z, use the localeCompare function to sort titles in ascending order
+      sortedResults = [...showsData].sort((a, b) =>
+        a.title.localeCompare(b.title)
+      );
     } else if (selectedSort === "Z-A") {
-      sortedResults = [...showsData].sort((a, b) => b.title.localeCompare(a.title));
+      sortedResults = [...showsData].sort((a, b) =>
+        b.title.localeCompare(a.title)
+      );
     } else if (selectedSort === "Latest") {
-      sortedResults = [...showsData].sort((a, b) => new Date(b.updated) - new Date(a.updated));
+      sortedResults = [...showsData].sort(
+        (a, b) => new Date(b.updated) - new Date(a.updated)
+      );
     } else if (selectedSort === "Oldest") {
-      sortedResults = [...showsData].sort((a, b) => new Date(a.updated) - new Date(b.updated));
+      sortedResults = [...showsData].sort(
+        (a, b) => new Date(a.updated) - new Date(b.updated)
+      );
     }
     setSearchResults(sortedResults);
   };
@@ -215,14 +247,23 @@ export default function Middle() {
         </div>
         <div className="Favs">
           {/* Favorites button */}
-          <SlButton variant="neutral" onClick={handleShowFavorites}>
+          <SlButton
+            variant="neutral"
+            onClick={() => {
+              setOpen(true);
+              handleShowFavorites();
+            }}
+          >
             Favorites
           </SlButton>
         </div>
         <div className="Sort">
           {/* Sort dropdown */}
           <SlButtonGroup label="Example Button Group">
-            <SlButton onClick={() => handleSortChange("Sort")} variant="primary">
+            <SlButton
+              onClick={() => handleSortChange("Sort")}
+              variant="primary"
+            >
               Sort
             </SlButton>
             <SlDropdown placement="bottom-end">
@@ -230,10 +271,18 @@ export default function Middle() {
                 Sort
               </SlButton>
               <SlMenu>
-                <SlMenuItem onClick={() => handleSortChange("A-Z")}>A-Z</SlMenuItem>
-                <SlMenuItem onClick={() => handleSortChange("Z-A")}>Z-A</SlMenuItem>
-                <SlMenuItem onClick={() => handleSortChange("Latest")}>Latest</SlMenuItem>
-                <SlMenuItem onClick={() => handleSortChange("Oldest")}>Oldest</SlMenuItem>
+                <SlMenuItem onClick={() => handleSortChange("A-Z")}>
+                  A-Z
+                </SlMenuItem>
+                <SlMenuItem onClick={() => handleSortChange("Z-A")}>
+                  Z-A
+                </SlMenuItem>
+                <SlMenuItem onClick={() => handleSortChange("Latest")}>
+                  Latest
+                </SlMenuItem>
+                <SlMenuItem onClick={() => handleSortChange("Oldest")}>
+                  Oldest
+                </SlMenuItem>
               </SlMenu>
             </SlDropdown>
           </SlButtonGroup>
@@ -242,35 +291,39 @@ export default function Middle() {
       <br />
       <br />
       <div className="podcast-list">
-        {searchResults.length > 0 ? (
-          // Render search results
-          searchResults.map((show) => (
-            <PodcastCard
-              key={show.id}
-              show={show}
-              handleAddToFavorites={handleAddToFavorites}
-              handleRemoveFromFavorites={handleRemoveFromFavorites}
-              isFavorite={isFavorite}
-            />
-          ))
-        ) : (
-          // If no search query, display all the cards
-          showsData.map((show) => (
-            <PodcastCard
-              key={show.id}
-              show={show}
-              handleAddToFavorites={handleAddToFavorites}
-              handleRemoveFromFavorites={handleRemoveFromFavorites}
-              isFavorite={isFavorite}
-            />
-          ))
-        )}
+        {searchResults.length > 0
+          ? // Render search results
+            searchResults.map((show) => (
+              <PodcastCard
+                key={show.id}
+                show={show}
+                handleAddToFavorites={handleAddToFavorites}
+                handleRemoveFromFavorites={handleRemoveFromFavorites}
+                isFavorite={isFavorite}
+              />
+            ))
+          : // If no search query, display all the cards
+            showsData.map((show) => (
+              <PodcastCard
+                key={show.id}
+                show={show}
+                handleAddToFavorites={handleAddToFavorites}
+                handleRemoveFromFavorites={handleRemoveFromFavorites}
+                isFavorite={isFavorite}
+              />
+            ))}
       </div>
 
       {/* Favorites section */}
       {showFavorites && (
         <div className="favorites-list">
-          <h2>Favorites</h2>
+          <SlDrawer
+            label="Favorites"
+            placement="bottom"
+            open={open}
+            onSlAfterHide={() => setOpen(false)}
+          >
+             <br />
           {favorites.length > 0 ? (
             favorites.map((showId) => {
               const favoriteShow = showsData.find((show) => show.id === showId);
@@ -287,6 +340,16 @@ export default function Middle() {
           ) : (
             <p>No favorites yet.</p>
           )}
+            <SlButton
+              slot="footer"
+              variant="primary"
+              onClick={() => setOpen(false)}
+            >
+              Close
+            </SlButton>
+          </SlDrawer>
+
+         
         </div>
       )}
     </div>
