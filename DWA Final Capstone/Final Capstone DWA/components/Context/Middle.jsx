@@ -16,6 +16,10 @@ import {
 import "./middle.css";
 import "./Buttons.css";
 import Loading from "../loading/Loading";
+import "./caro.css";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // Define the genres array with different categories of shows
 const genres = [
@@ -42,96 +46,19 @@ const getGenres = (genreIds) => {
   return genreIds.map((id) => genres[id - 1]).join(",");
 };
 
-const PodcastCard = ({
-  show,
-  handleAddToFavorites,
-  handleRemoveFromFavorites,
-  isFavorite,
-}) => {
-  const [showSeasons, setShowSeasons] = useState(false); // State variable to control seasons visibility
-
-  const handleShowSeasons = () => {
-    setShowSeasons(!showSeasons); // Toggle the value of showSeasons
-  };
-
-  return (
-    <div className="podcast-card">
-      <SlCard className="card-overview">
-        {show.image && <img src={show.image} alt={show.title} />}
-        <strong>{show.title}</strong>
-        <br />
-        <medium>Genre : {getGenres(show.genres)} </medium>
-        <br />
-        <br />
-        <small>
-          Last Updated:{" "}
-          {new Date(show.updated).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </small>
-      </SlCard>
-      {show.seasons && (
-        <div className="seasons-dropdown">
-          <SlButton variant="neutral" onClick={handleShowSeasons}>
-            {showSeasons ? "Hide Seasons" : "Show Seasons"}
-          </SlButton>
-          {showSeasons && (
-            <SlTree>
-              <SlTreeItem>
-                Seasons
-                {show.seasons.map((season) => (
-                  <SlTreeItem key={season.id}>
-                    {season.name}
-                    {season.episodes && (
-                      <SlTreeItem>
-                        {season.episodes.map((episode) => (
-                          <SlTreeItem key={episode.id}>
-                            {episode.name}
-                          </SlTreeItem>
-                        ))}
-                      </SlTreeItem>
-                    )}
-                  </SlTreeItem>
-                ))}
-              </SlTreeItem>
-            </SlTree>
-          )}
-        </div>
-      )}
-      <div className="card-footer">
-        <SlDetails summary="Show Description">{show.description}</SlDetails>
-        <br />
-        <button
-          label="Rating"
-          getSymbol={() => '<sl-icon name="heart-fill"></sl-icon>'}
-          style={{ "--symbol-color-active": "#ff4136" }}
-          onClick={() => {
-            if (isFavorite(show.id)) {
-              handleRemoveFromFavorites(show.id);
-            } else {
-              handleAddToFavorites(show.id);
-            }
-          }}
-          interactive // Make the rating component clickable
-        >
-          Add to favorites
-        </button>
-      </div>
-    </div>
-  );
-};
-
 export default function Middle() {
   // State hooks for managing the component's state
-  const [open, setOpen] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showsData, setShowsData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true); // Introduce a loading state
   const [showFavorites, setShowFavorites] = useState(false); // State variable to control favorites visibility
+
+  const toggleOverlay = () => {
+    setShowOverlay(!showOverlay);
+  };
 
   // Fetch the shows data from the API using useEffect
   useEffect(() => {
@@ -181,6 +108,14 @@ export default function Middle() {
       setSearchQuery("");
     };
   }
+
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 100,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+  };
 
   // Handler for changing the sort criteria
   const handleSortChange = (selectedSort) => {
@@ -250,7 +185,7 @@ export default function Middle() {
           <SlButton
             variant="neutral"
             onClick={() => {
-              setOpen(true);
+              toggleOverlay;
               handleShowFavorites();
             }}
           >
@@ -264,7 +199,7 @@ export default function Middle() {
               onClick={() => handleSortChange("Sort")}
               variant="primary"
             >
-              Sort
+              Reset
             </SlButton>
             <SlDropdown placement="bottom-end">
               <SlButton slot="trigger" variant="primary" caret>
@@ -288,7 +223,29 @@ export default function Middle() {
           </SlButtonGroup>
         </div>
       </div>
+
+      <div className="caro">
+  {loading ? (
+    <Loading /> // loading 
+  ) : (
+    <div>
+      <h2 className="cool">Suggestions</h2>
       <br />
+      <div className="carousel-container">
+        <Slider {...settings}>
+          {showsData.map((show) => (
+            <div className="carousel-item" key={show.title}>
+              <img src={show.image} alt={`show - ${show.title}`} />
+            </div>
+          ))}
+        </Slider>
+      </div>
+    </div>
+  )}
+</div>
+
+
+      
       <br />
       <div className="podcast-list">
         {searchResults.length > 0
@@ -313,45 +270,143 @@ export default function Middle() {
               />
             ))}
       </div>
-
-      {/* Favorites section */}
+      Favorites section
       {showFavorites && (
-        <div className="favorites-list">
+        <div className="p1">
           <SlDrawer
             label="Favorites"
             placement="bottom"
             open={open}
             onSlAfterHide={() => setOpen(false)}
           >
-             <br />
-          {favorites.length > 0 ? (
-            favorites.map((showId) => {
-              const favoriteShow = showsData.find((show) => show.id === showId);
-              return (
-                <PodcastCard
-                  key={favoriteShow.id}
-                  show={favoriteShow}
-                  handleAddToFavorites={handleAddToFavorites}
-                  handleRemoveFromFavorites={handleRemoveFromFavorites}
-                  isFavorite={isFavorite}
-                />
-              );
-            })
-          ) : (
-            <p>No favorites yet.</p>
-          )}
-            <SlButton
-              slot="footer"
-              variant="primary"
-              onClick={() => setOpen(false)}
-            >
-              Close
-            </SlButton>
+            <br />
+            {favorites.length > 0 ? (
+              favorites.map((showId) => {
+                const favoriteShow = showsData.find(
+                  (show) => show.id === showId
+                );
+                return (
+                  <PodcastCard
+                    key={favoriteShow.id}
+                    show={favoriteShow}
+                    handleAddToFavorites={handleAddToFavorites}
+                    handleRemoveFromFavorites={handleRemoveFromFavorites}
+                    isFavorite={isFavorite}
+                  />
+                );
+              })
+            ) : (
+              <p>No favorites yet.</p>
+            )}
           </SlDrawer>
-
-         
         </div>
       )}
     </div>
   );
 }
+
+const PodcastCard = ({
+  show,
+  handleAddToFavorites,
+  handleRemoveFromFavorites,
+  isFavorite,
+}) => {
+  const [showSeasons, setShowSeasons] = useState(false); // State variable to control seasons visibility
+
+  const handleShowSeasons = () => {
+    setShowSeasons(!showSeasons); // Toggle the value of showSeasons
+  };
+
+  return (
+    <div className="podcast-card">
+      
+      <SlCard className="card-overview">
+        {show.image && <img src={show.image} alt={show.title} />}
+        <strong>{show.title}</strong>
+        <br />
+        <medium>Genre : {getGenres(show.genres)} </medium>
+        <br />
+        <br />
+        <small>
+          Last Updated:{" "}
+          {new Date(show.updated).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </small>
+      </SlCard>
+
+      {show.seasons && (
+        <div className="seasons-dropdown">
+          <SlButton variant="neutral" onClick={handleShowSeasons}>
+            {showSeasons ? "Hide Seasons" : "Show Seasons"}
+          </SlButton>
+          {showSeasons && (
+            <SlTree>
+              <SlTreeItem>
+                Seasons
+                {show.seasons.map((season) => (
+                  <SlTreeItem>
+                    {season.title}
+
+                    {season.episodes && (
+                      <SlTreeItem>
+                        <medium>Episodes</medium>
+                        {season.episodes.map((episode) => (
+                          <SlTreeItem key={episode.id}>
+                            <img
+                              src={season.image}
+                              alt={`Season ${season.season}`}
+                              style={{ maxWidth: "200px" }}
+                            />
+                            <br />
+                            <div className="season">
+                              {season.episodes.map((episode, index) => (
+                                <div key={index}>
+                                  <SlDetails
+                                    summary={`${episode.episode}. ${episode.title}`}
+                                  >
+                                    {episode.description}
+                                    <SlDetails summary="Play Episode">
+                                      <audio controls>
+                                        <source src={episode.file} />
+                                      </audio>
+                                    </SlDetails>
+                                  </SlDetails>
+                                </div>
+                              ))}
+                            </div>
+                          </SlTreeItem>
+                        ))}
+                      </SlTreeItem>
+                    )}
+                  </SlTreeItem>
+                ))}
+              </SlTreeItem>
+            </SlTree>
+          )}
+        </div>
+      )}
+      <div className="card-footer">
+        <SlDetails summary="Show Description">{show.description}</SlDetails>
+        <br />
+        <button
+          label="Rating"
+          getSymbol={() => '<sl-icon name="heart-fill"></sl-icon>'}
+          style={{ "--symbol-color-active": "#ff4136" }}
+          onClick={() => {
+            if (isFavorite(show.id)) {
+              handleRemoveFromFavorites(show.id);
+            } else {
+              handleAddToFavorites(show.id);
+            }
+          }}
+          interactive // Make the rating component clickable
+        >
+          Add to favorites
+        </button>
+      </div>
+    </div>
+  );
+};
